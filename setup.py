@@ -51,10 +51,10 @@ class Install(install):
     def finalize_options(self):
         # NOTE: for Pardus distribution
         if os.path.exists("/etc/pisilinux-release"):
-            self.install_platlib = '$base/lib/pisilinux'
-            self.install_purelib = '$base/lib/pisilinux'
+            self.install_platlib = '$base/lib/pisilinux3'
+            self.install_purelib = '$base/lib/pisilinux3'
         install.finalize_options(self)
-    
+
     def run(self):
         install.run(self)
 

@@ -131,14 +131,14 @@ def _getPid(pidfile):
     """Read process ID from a .pid file."""
     try:
         pid = file(pidfile).read()
-    except IOError, e:
+    except IOError as e:
         if e.errno != 2:
             raise
         return None
     # Some services put custom data after the first line
     pid = pid.split("\n")[0].strip()
     # Non-pid data is also seen when stopped state in some services :/
-    if len(pid) == 0 or len(filter(lambda x: not x in "0123456789", pid)) > 0:
+    if len(pid) == 0 or len([x for x in pid if not x in "0123456789"]) > 0:
         return None
     return int(pid)
 
@@ -154,7 +154,7 @@ def _checkPid(pid, user_uid=None, command=None, name=None):
     if user_uid:
         try:
             st = os.stat(path)
-        except OSError, e:
+        except OSError as e:
             if e.errno != 2:
                 raise
             return False
@@ -164,7 +164,7 @@ def _checkPid(pid, user_uid=None, command=None, name=None):
     if command:
         try:
             cmdline = file("%s/cmdline" % path).read()
-        except IOError, e:
+        except IOError as e:
             if e.errno != 2:
                 raise
             return False
@@ -173,7 +173,7 @@ def _checkPid(pid, user_uid=None, command=None, name=None):
     elif name:
         try:
             stats = file("%s/stat" % path).read()
-        except IOError, e:
+        except IOError as e:
             if e.errno != 2:
                 raise
             return False
@@ -217,7 +217,7 @@ def startService(command, args=None, pidfile=None, makepid=False, nice=None, det
     """
     cmd = [ command ]
     if args:
-        if isinstance(args, basestring):
+        if isinstance(args, str):
             args = shlex.split(args)
         cmd.extend(args)
 
@@ -239,7 +239,7 @@ def startService(command, args=None, pidfile=None, makepid=False, nice=None, det
         if detach:
             # Set umask to a sane value
             # (other and group has no write permission by default)
-            os.umask(022)
+            os.umask(0o22)
             # Detach from controlling terminal
             try:
                 tty_fd = os.open("/dev/tty", os.O_RDWR)
@@ -301,7 +301,7 @@ def stopService(pidfile=None, command=None, args=None, chuid=None, user=None, na
     if command and args is not None:
         cmd = [ command ]
         if args:
-            if isinstance(args, basestring):
+            if isinstance(args, str):
                 args = shlex.split(args)
             cmd.extend(args)
 
